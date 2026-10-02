@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <!-- 
+    Macro to create a virtual base system for a robot. 
+    This includes a virtual base link, three joints (x, y, yaw), 
+    and a ros2_control system interface for controlling the virtual base.
+    @param world_link (String) The unique name of the world link. (parent of the first virtual)
+    @param base_link (String) The unique name of the base link. (child of the last virtual)
+  -->
+  <xacro:macro name="virtual_base_system" params="world_link:=world base_link:=base">
+
+  <joint name="virtual_joint_x" type="prismatic">
+    <parent link="${world_link}"/>
+    <child link="virtual_base_link_x"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1000" upper="1000" effort="1000" velocity="1"/>
+  </joint>
+  <joint name="virtual_joint_y" type="prismatic">
+    <parent link="virtual_base_link_x"/>
+    <child link="virtual_base_link_y"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1000" upper="1000" effort="1000" velocity="1"/>
+  </joint>
+  <joint name="virtual_joint_yaw" type="continuous">
+    <parent link="virtual_base_link_y"/>
+    <child link="${base_link}"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <link name="virtual_base_link_x">
+    <origin xyz="0 0 0.0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <link name="virtual_base_link_y">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <ros2_control name="virtual_base" type="system">
+    <hardware>
+      <plugin>gz_virtual_base_system/GazeboVirtualBaseSystem</plugin>
+      <param name="x_joint">virtual_joint_x</param>
+      <param name="y_joint">virtual_joint_y</param>
+      <param name="yaw_joint">virtual_joint_yaw</param>
+      <param name="gpio_name">mobile_base</param>
+      <!-- Optional body-frame acceleration limits (0 = off). -->
+      <param name="max_linear_acc">0</param>
+      <param name="max_angular_acc">0</param>
+    </hardware>
+
+    <!-- Joint states only. Nothing writes to these directly, the plugin does it after rotating -->
+    <joint name="virtual_joint_x">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="virtual_joint_y">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="virtual_joint_yaw">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <gpio name="mobile_base">
+      <command_interface name="vx"/>
+      <command_interface name="vy"/>
+      <command_interface name="wz"/>
+      <state_interface name="vx"/>
+      <state_interface name="vy"/>
+      <state_interface name="wz"/>
+    </gpio>
+  </ros2_control>
+
+  </xacro:macro>
+</robot>

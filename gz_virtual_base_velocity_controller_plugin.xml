@@ -1,0 +1,12 @@
+<!-- gz_virtual_base_velocity_controller_plugin.xml -->
+
+<library path="gz_virtual_base_velocity_controller">
+  <class
+      name="gz_virtual_base_velocity_controller/GazeboVirtualBaseVelocityController"
+      type="gz_virtual_base_velocity_controller::GazeboVirtualBaseVelocityController"
+      base_class_type="controller_interface::ControllerInterface">
+    <description>
+      TwistStamped controller for virtual omnidirectional base.
+    </description>
+  </class>
+</library>

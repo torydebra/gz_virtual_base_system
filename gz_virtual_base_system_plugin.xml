@@ -1,0 +1,10 @@
+<library path="gz_virtual_base_system">
+  <class name="gz_virtual_base_system/GazeboVirtualBaseSystem"
+         type="gz_virtual_base_system::GazeboVirtualBaseSystem"
+         base_class_type="gz_ros2_control::GazeboSimSystemInterface">
+    <description>
+      Gazebo system interface exposing body-frame velocity commands (vx, vy, wz)
+      for a holonomic base modelled as virtual x/y/yaw joints.
+    </description>
+  </class>
+</library>

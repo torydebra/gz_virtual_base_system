@@ -1,0 +1,22 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time: true
+
+    # One controller claiming base/vx, base/vy, base/wz. GPIO controller
+    # necessary since the interfaces exposed are not joints, controllers like
+    # forward_command_controller cannot be used. gpio controller could be used,
+    # but it is generic with verbose structure of ros messages. So better use 
+    # this custom one
+    virtual_base_cmd_controller:
+      type: gz_virtual_base_velocity_controller/GazeboVirtualBaseVelocityController
+
+virtual_base_cmd_controller:
+  ros__parameters:
+    cmd_vel_topic: /cmd_vel
+    cmd_vel_timeout: 0.5
+    odom_topic: /odom
+    # for consistency, these should be the first frame
+    # before the virtual chain and the last one
+    odom_frame_id: odom
+    base_frame_id: base_link

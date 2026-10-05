@@ -64,7 +64,7 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-install(DIRECTORY config urdf DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY config urdf launch world DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

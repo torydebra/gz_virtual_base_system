@@ -7,34 +7,22 @@
       <real_time_factor>1.0</real_time_factor>
     </physics>
     <plugin
-      filename="ignition-gazebo-physics-system"
-      name="ignition::gazebo::systems::Physics">
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
     </plugin>
     <plugin
-        filename="ignition-gazebo-scene-broadcaster-system"
-        name="ignition::gazebo::systems::SceneBroadcaster">
+        filename="gz-sim-scene-broadcaster-system"
+        name="gz::sim::systems::SceneBroadcaster">
     </plugin>
     <plugin
-      filename="libignition-gazebo-sensors-system.so"
-      name="ignition::gazebo::systems::Sensors">
+      filename="gz-sim-sensors-system.so"
+      name="gz::sim::systems::Sensors">
       <render_engine>ogre2</render_engine>
-    </plugin>
-
-    <plugin filename="libignition-gazebo-imu-system.so"
-            name="ignition::gazebo::systems::Imu">
-    </plugin>
-    <plugin
-      filename="libignition-gazebo-magnetometer-system"
-      name="ignition::gazebo::systems::Magnetometer">
-    </plugin>
-    <plugin
-      filename="libignition-gazebo-forcetorque-system"
-      name="ignition::gazebo::systems::ForceTorque">
     </plugin>
     <!-- Necessary for spawining robot even from the launch-->
     <plugin
-      filename="libignition-gazebo-user-commands-system"
-      name="ignition::gazebo::systems::UserCommands">
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
     </plugin>
 
     <light type="directional" name="sun">

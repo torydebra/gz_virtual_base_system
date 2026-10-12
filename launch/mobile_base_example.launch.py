@@ -15,6 +15,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 import xacro
 
 
@@ -36,16 +37,17 @@ def generate_launch_description():
     pkg_project = get_package_share_directory('gz_virtual_base_system')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
-    # Opaque function to use the launch argument inside here
-    def create_robot_description(context):
-        robot_xacro = os.path.join(pkg_project, "urdf/", "base_example.urdf.xacro")
-        assert os.path.exists(robot_xacro), "The base_example.urdf.xacro doesnt exist in " + str(robot_xacro)
-        robot_description_config = xacro.process_file(
-            robot_xacro
-        )
-        robot_desc = robot_description_config.toxml()
+    robot_xacro = os.path.join(pkg_project, "urdf/", "base_example.urdf.xacro")
+    assert os.path.exists(robot_xacro), "The base_example.urdf.xacro doesnt exist in " + str(robot_xacro)
 
-        return [SetLaunchConfiguration("robot_desc", robot_desc)]
+    # Opaque function to use optional future launch arguments inside here
+    def create_robot_description(context, *args, **kwargs):
+        robot_description_config = xacro.process_file(
+            robot_xacro,
+            mappings={"root_link": "odom"}
+        )
+
+        return [SetLaunchConfiguration("robot_desc", robot_description_config.toxml())]
 
     create_robot_description_arg = OpaqueFunction(
         function=create_robot_description
@@ -56,7 +58,7 @@ def generate_launch_description():
         executable="rviz2",
         arguments=[
             "-d",
-            os.path.join(pkg_project, "/config/rviz", "mobile_base.rviz"),
+            os.path.join(pkg_project, "config/rviz", "mobile_base.rviz"),
         ],
         condition=IfCondition(LaunchConfiguration("rviz")),
         parameters=[
@@ -74,22 +76,21 @@ def generate_launch_description():
         }.items()
     )
 
-
     # Spawn robot
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
         name='mobile_base_spawner',
         arguments=[
+            "-world", "mobile_base_world",
             "-name", "mobile_base",
-            "-entity", "model",
             "-x", LaunchConfiguration('x'),
             "-y", LaunchConfiguration('y'),
             "-z", LaunchConfiguration('z'),
             "-R", LaunchConfiguration('R'),
             "-P", LaunchConfiguration('P'),
             "-Y", LaunchConfiguration('Y'),
-            "-topic", "robot_description",
+            "-string", xacro.process_file(robot_xacro, mappings={"root_link": "world"}).toxml(),
         ],
         output="screen",
     )
@@ -110,7 +111,7 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {"use_sim_time": LaunchConfiguration("use_sim_time")},
-            {"robot_description": LaunchConfiguration("robot_desc")},
+            {"robot_description": ParameterValue(LaunchConfiguration("robot_desc"), value_type=str)},
         ],
     )
 
@@ -120,8 +121,8 @@ def generate_launch_description():
         name="spawn_controller_manager",
         output="screen",
         arguments=[
+            "joint_state_broadcaster", "virtual_base_cmd_controller",
             "--controller-manager", "controller_manager", #just the name of the controller_manager
-            "joint_state_broadcaster", "virtual_base_cmd_controller"
         ],
         parameters=[
             {"use_sim_time": LaunchConfiguration("use_sim_time")},

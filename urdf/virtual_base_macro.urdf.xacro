@@ -4,24 +4,27 @@
     Macro to create a virtual base system for a robot. 
     This includes a virtual base link, three joints (x, y, yaw), 
     and a ros2_control system interface for controlling the virtual base.
-    @param world_link (String) The unique name of the world link. (parent of the first virtual)
+    @param root_link (String) The unique name of the world link. (parent of the first virtual). Put world for 
+    gazebo, odom for ROS2 control.
     @param base_link (String) The unique name of the base link. (child of the last virtual)
   -->
-  <xacro:macro name="virtual_base_system" params="world_link:=world base_link:=base">
+  <xacro:macro name="virtual_base_system" params="root_link:=world base_link:=base">
+
+  <link name="${root_link}"/>
 
   <joint name="virtual_joint_x" type="prismatic">
-    <parent link="${world_link}"/>
+    <parent link="${root_link}"/>
     <child link="virtual_base_link_x"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="1 0 0"/>
-    <limit lower="-1000" upper="1000" effort="1000" velocity="1"/>
+    <limit lower="-100000" upper="100000" effort="100000" velocity="1"/>
   </joint>
   <joint name="virtual_joint_y" type="prismatic">
     <parent link="virtual_base_link_x"/>
     <child link="virtual_base_link_y"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-1000" upper="1000" effort="1000" velocity="1"/>
+    <limit lower="-100000" upper="100000" effort="100000" velocity="1"/>
   </joint>
   <joint name="virtual_joint_yaw" type="continuous">
     <parent link="virtual_base_link_y"/>
@@ -30,7 +33,6 @@
     <axis xyz="0 0 1"/>
   </joint>
   <link name="virtual_base_link_x">
-    <origin xyz="0 0 0.0" rpy="0 0 0"/>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.001"/>
@@ -38,7 +40,6 @@
     </inertial>
   </link>
   <link name="virtual_base_link_y">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.001"/>

@@ -2,8 +2,8 @@
 <robot name="mobile_base" xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:include filename="$(find gz_virtual_base_system)/urdf/virtual_base_macro.urdf.xacro" />
 
-    <link name="world"/>
-    <xacro:virtual_base_system world_link="world" base_link="mobile_base_link" />
+    <xacro:arg name="root_link" default="world"/>
+    <xacro:virtual_base_system root_link="$(arg root_link)" base_link="mobile_base_link"/>
 
     <link name="mobile_base_link">
         <inertial>
